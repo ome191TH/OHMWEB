@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🎫 Async/Await — เรียนรู้ด้วยบัตรคิว</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fdf8f2;
+    --card: #ffffff;
+    --ink: #2d2a26;
+    --muted: #7a736a;
+    --primary: #6d4aff;
+    --primary-soft: #efeaff;
+    --accent: #ff8a3d;
+    --accent-soft: #fff1e5;
+    --green: #1fa97c;
+    --green-soft: #e6f7f0;
+    --red: #e5484d;
+    --red-soft: #fdebec;
+    --code-bg: #241f2e;
+    --code-ink: #e8e3f5;
+    --yellow: #ffd84d;
+    --border: #eee3d6;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Sarabun', 'Noto Sans Thai', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.75;
+  }
+  code, pre { font-family: 'Fira Code', 'Consolas', monospace; }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+  section { padding: 56px 0 20px; scroll-margin-top: 70px; }
+  h2 { font-size: 1.65rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
+  h2 .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 12px; margin-right: 10px;
+    background: var(--primary); color: #fff; font-size: 1.1rem; vertical-align: -6px;
+  }
+  .lead { color: var(--muted); margin-bottom: 26px; font-size: 1.02rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 26px;
+    box-shadow: 0 4px 18px rgba(90, 70, 40, 0.06);
+    margin-bottom: 20px;
+  }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50; background: rgba(253, 248, 242, 0.92);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
+  }
+  nav .wrap { display: flex; gap: 8px; overflow-x: auto; padding: 10px 20px; }
+  nav a {
+    flex-shrink: 0; text-decoration: none; color: var(--muted); font-weight: 600;
+    font-size: 0.9rem; padding: 6px 14px; border-radius: 999px; background: #fff;
+    border: 1px solid var(--border); transition: 0.2s;
+  }
+  nav a:hover { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
+
+  /* ---------- Hero ---------- */
+  header { text-align: center; padding: 72px 20px 30px; position: relative; overflow: hidden; }
+  .badge {
+    display: inline-block; background: var(--accent-soft); color: var(--accent);
+    font-weight: 700; font-size: 0.85rem; padding: 5px 16px; border-radius: 999px; margin-bottom: 14px;
+  }
+  header h1 { font-size: clamp(1.9rem, 5vw, 3rem); font-weight: 800; letter-spacing: -1px; }
+  header h1 em { font-style: normal; color: var(--primary); }
+  header p.sub { color: var(--muted); max-width: 620px; margin: 14px auto 0; font-size: 1.05rem; }
+  .ticket-hero { font-size: 3.2rem; margin-bottom: 6px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    border: none; border-radius: 14px; padding: 12px 22px; font-size: 1rem;
+    font-family: inherit; font-weight: 700; transition: 0.15s; color: #fff;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-purple { background: var(--primary); }
+  .btn-purple:hover:not(:disabled) { background: #5a38e8; }
+  .btn-orange { background: var(--accent); }
+  .btn-orange:hover:not(:disabled) { background: #f0722a; }
+  .btn-red { background: var(--red); }
+  .btn-red:hover:not(:disabled) { background: #cf3a3f; }
+  .btn-green { background: var(--green); }
+  .btn-green:hover:not(:disabled) { background: #178a67; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+
+  /* ---------- Code blocks ---------- */
+  pre.code {
+    background: var(--code-bg); color: var(--code-ink); border-radius: 14px;
+    padding: 18px 20px; overflow-x: auto; font-size: 0.88rem; line-height: 1.9;
+    margin: 14px 0; position: relative;
+  }
+  pre.code .ln { display: block; padding: 1px 10px; border-radius: 8px; transition: background 0.3s; }
+  pre.code .ln.active { background: rgba(255, 216, 77, 0.18); outline: 1px solid rgba(255,216,77,0.5); }
+  .kw { color: #c792ea; } .fn { color: #82aaff; } .str { color: #c3e88d; }
+  .cm { color: #7a7392; } .num-lit { color: #f78c6c; } .prop { color: #ffcb6b; }
+
+  /* ---------- Demo A: Freeze ---------- */
+  .freeze-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 720px) { .freeze-grid { grid-template-columns: 1fr; } }
+  .clock-box { text-align: center; padding: 22px; border-radius: 14px; background: var(--green-soft); border: 2px solid var(--green); transition: 0.3s; }
+  .clock-box.frozen { background: var(--red-soft); border-color: var(--red); }
+  .clock-box .clock { font-family: 'Fira Code', monospace; font-size: 1.7rem; font-weight: 600; letter-spacing: 1px; }
+  .clock-box .lbl { font-size: 0.85rem; color: var(--muted); }
+  .spinner {
+    width: 34px; height: 34px; margin: 10px auto 2px; border-radius: 50%;
+    border: 4px solid #d9f0e7; border-top-color: var(--green);
+  }
+  .status {
+    margin-top: 12px; padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: 0.95rem;
+    background: #f4f0ea; color: var(--muted);
+  }
+  .status.ok { background: var(--green-soft); color: var(--green); }
+  .status.bad { background: var(--red-soft); color: var(--red); }
+
+  /* ---------- Mapping table (queue ticket) ---------- */
+  .map-row {
+    display: grid; grid-template-columns: 1fr 44px 1fr; align-items: center;
+    gap: 10px; padding: 14px 16px; border-radius: 14px; margin-bottom: 10px;
+    background: #fff; border: 1px solid var(--border); transition: 0.2s;
+  }
+  .map-row:hover { border-color: var(--primary); box-shadow: 0 4px 14px rgba(109,74,255,0.12); transform: translateY(-1px); }
+  .map-row .real { text-align: right; font-weight: 700; }
+  .map-row .arrow { text-align: center; color: var(--primary); font-size: 1.2rem; font-weight: 800; }
+  .map-row .code-side { font-family: 'Fira Code', monospace; font-size: 0.85rem; background: var(--primary-soft); color: var(--primary); border-radius: 8px; padding: 6px 10px; }
+  @media (max-width: 620px) {
+    .map-row { grid-template-columns: 1fr; text-align: center; }
+    .map-row .real { text-align: center; }
+  }
+
+  /* ---------- Coffee walkthrough ---------- */
+  .coffee-stage {
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; align-items: start;
+  }
+  @media (max-width: 720px) { .coffee-stage { grid-template-columns: 1fr; } }
+  .steps { display: flex; flex-direction: column; gap: 8px; }
+  .step {
+    display: flex; gap: 12px; align-items: flex-start; padding: 13px 16px;
+    border-radius: 12px; border: 1px solid var(--border); background: #fff;
+    opacity: 0.45; transition: 0.35s;
+  }
+  .step .icon { font-size: 1.5rem; line-height: 1.4; }
+  .step .t { font-weight: 700; font-size: 0.98rem; }
+  .step .d { font-size: 0.88rem; color: var(--muted); }
+  .step.on { opacity: 1; border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 4px 14px rgba(255,138,61,0.18); }
+  .step.done { opacity: 1; border-color: var(--green); background: var(--green-soft); }
+
+  /* ---------- Pipeline (fetch 2 รอบ) ---------- */
+  .pipeline { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; margin: 18px 0; }
+  .pipe {
+    flex: 1 1 150px; text-align: center; padding: 16px 12px; border-radius: 14px;
+    border: 2px solid var(--border); background: #fff; transition: 0.3s; position: relative;
+  }
+  .pipe .emoji { font-size: 1.8rem; }
+  .pipe .code-t { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: var(--primary); font-weight: 600; margin-top: 4px; }
+  .pipe .desc { font-size: 0.85rem; color: var(--muted); }
+  .pipe .time { font-size: 0.78rem; font-weight: 700; color: var(--accent); margin-top: 4px; min-height: 18px; }
+  .pipe.wait { border-color: var(--yellow); background: #fffbe8; animation: pulse 1s ease-in-out infinite; }
+  .pipe.on { border-color: var(--green); background: var(--green-soft); transform: translateY(-3px); }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,216,77,0.5); } 50% { box-shadow: 0 0 0 8px rgba(255,216,77,0); } }
+  .console {
+    background: #1b1722; color: #b8f5d0; border-radius: 14px; padding: 16px 18px;
+    font-family: 'Fira Code', monospace; font-size: 0.82rem; line-height: 1.9;
+    min-height: 120px; max-height: 220px; overflow-y: auto;
+  }
+  .console .line { opacity: 0; animation: fadein 0.4s forwards; }
+  .console .t-dim { color: #6d6580; }
+  @keyframes fadein { to { opacity: 1; } }
+  #dogResult { text-align: center; margin-top: 16px; }
+  #dogResult img { max-width: 300px; width: 100%; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+
+  /* ---------- Rules ---------- */
+  .rule { display: flex; gap: 14px; margin-bottom: 14px; }
+  .rule .rnum {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-weight: 800; color: #fff; background: var(--primary);
+  }
+  .vs-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+  .vs-table th { text-align: left; font-size: 0.85rem; color: var(--muted); padding: 0 14px; }
+  .vs-table td { background: #fff; padding: 12px 14px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .vs-table td:first-child { border-left: 1px solid var(--border); border-radius: 12px 0 0 12px; font-weight: 700; }
+  .vs-table td:last-child { border-right: 1px solid var(--border); border-radius: 0 12px 12px 0; }
+  .tag-ok { color: var(--green); font-weight: 700; }
+  .tag-bad { color: var(--red); font-weight: 700; }
+  .pill { display: inline-block; padding: 2px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+  .pill.green { background: var(--green-soft); color: var(--green); }
+  .pill.red { background: var(--red-soft); color: var(--red); }
+
+  /* ---------- Quiz ---------- */
+  .quiz-q { border: 1px solid var(--border); border-radius: 14px; background: #fff; margin-bottom: 14px; overflow: hidden; }
+  .quiz-q .q { padding: 18px 20px; display: flex; justify-content: space-between; gap: 14px; align-items: center; cursor: pointer; }
+  .quiz-q .q:hover { background: var(--primary-soft); }
+  .quiz-q .q .qt { font-weight: 700; }
+  .quiz-q .chev { transition: 0.3s; color: var(--primary); flex-shrink: 0; }
+  .quiz-q.open .chev { transform: rotate(180deg); }
+  .quiz-q .a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .quiz-q.open .a { max-height: 260px; }
+  .quiz-q .a .inner { padding: 4px 20px 18px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 14px; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.88rem; padding: 50px 20px 60px; }
+  .tip-box { border-left: 5px solid var(--accent); background: var(--accent-soft); border-radius: 0 14px 14px 0; padding: 14px 18px; margin: 16px 0; font-size: 0.95rem; }
+  .warn-box { border-left: 5px solid var(--red); background: var(--red-soft); border-radius: 0 14px 14px 0; padding: 14px 18px; margin: 16px 0; font-size: 0.95rem; }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<nav>
+  <div class="wrap">
+    <a href="#problem">❄️ ปัญหา</a>
+    <a href="#promise">🎫 บัตรคิว</a>
+    <a href="#fetch">📦 Fetch 2 รอบ</a>
+    <a href="#rules">📏 กติกา</a>
+    <a href="#quiz">🧠 ทบทวน</a>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header>
+  <div class="ticket-hero">🎫☕</div>
+  <div class="badge">JS FUNDAMENTALS — สรุปจากบทเรียนจริง</div>
+  <h1><em>Async / Await</em> อธิบายด้วย<br/>บัตรคิวร้านก๋วยเตี๋ยว</h1>
+  <p class="sub">ทำไมหน้าเว็บถึงค้าง? Promise คืออะไร? ทำไมต้อง await 2 รอบ? — เข้าใจทั้งหมดด้วยการกดเล่นจริง</p>
+</header>
+
+<div class="wrap">
+
+<!-- ================= SECTION 1: PROBLEM ================= -->
+<section id="problem">
+  <h2><span class="num">1</span>ปัญหา: JS มีพนักงานแค่คนเดียว</h2>
+  <p class="lead">JavaScript ทำงานทีละอย่าง (single thread) — เหมือนร้านก๋วยเตี๋ยวที่มีพนักงานคนเดียว ถ้าเขายืนตายเงียบรอน้ำเดือด ทั้งร้านก็หยุดตาม ⬇️ <b>กดทดลองเลย</b></p>
+
+  <div class="card">
+    <div class="freeze-grid">
+      <div class="clock-box" id="clockBox">
+        <div class="spinner" id="spinner"></div>
+        <div class="clock" id="clock">00:00.0</div>
+        <div class="lbl">นาฬิกา + จานหมุน (ขับเคลื่อนด้วย JS)<br/>ถ้าหน้าเว็บค้าง → มันจะหยุดเดินด้วย</div>
+      </div>
+      <div>
+        <p style="font-weight:700; margin-bottom:4px;">🧪 ทดลอง 2 แบบ:</p>
+        <div class="btn-row" style="flex-direction:column;">
+          <button class="btn btn-red" id="btnSync">❄️ สั่งงานแบบ Sync (ค้าง 2 วินาที)</button>
+          <button class="btn btn-green" id="btnAsync">✅ สั่งงานแบบ Async (รอ 2 วินาที)</button>
+        </div>
+        <div class="status" id="syncStatus">กดปุ่มด้านบน แล้วเฝ้าดูนาฬิกา...</div>
+        <div class="tip-box" style="margin-bottom:0;">
+          สังเกต: กดแบบ <b>Sync</b> → นาฬิกาหยุดเดิน จานหมุนตาย กดอะไรไม่ได้เลย<br/>
+          กดแบบ <b>Async</b> → รอแค่ "ฟังก์ชันนี้" นาฬิกายังเดิน หน้าเว็บยังลื่น
+        </div>
+      </div>
+    </div>
+<pre class="code"><span class="ln" id="ln-sync">// ❌ แบบ Sync: JS ยืนรอเอง ทั้งร้านหยุด
+const start = Date.now()
+while (Date.now() - start &lt; 2000) { }  // วนลูปเปล่าๆ 2 วินาที 😵
+
+// ✅ แบบ Async: เอาบัตรคิวไว้ ไปทำอย่างอื่นก่อน
+await new Promise(r =&gt; setTimeout(r, 2000))  // รอ 2 วิ แบบสงเสีย</span></pre>
+  </div>
+</section>
+
+<!-- ================= SECTION 2: PROMISE ================= -->
+<section id="promise">
+  <h2><span class="num">2</span>บัตรคิว = Promise</h2>
+  <p class="lead">fetch() ไม่ได้ให้ข้อมูลเลย — มันให้ <b>"ใบสัญญาว่าของจะมา"</b> ก่อน สิ่งนั้นคือ Promise (ชี้ที่แถวไหนก็ได้ มันจะสว่างให้ดู)</p>
+
+  <div class="card">
+    <div class="map-row">
+      <div class="real">🎫 บัตรคิวที่พนักงานยื่นให้</div><div class="arrow">→</div>
+      <div class="code-side">Promise</div>
+    </div>
+    <div class="map-row">
+      <div class="real">💬 "ไปทำอย่างอื่นก่อน เดี๋ยวเรียก"</div><div class="arrow">→</div>
+      <div class="code-side">หน้าเว็บส่วนอื่นยังใช้ได้ปกติ</div>
+    </div>
+    <div class="map-row">
+      <div class="real">🔔 เบอร์ถูกเรียก เอาบัตรไปแลกของจริง</div><div class="arrow">→</div>
+      <div class="code-side">await</div>
+    </div>
+    <div class="map-row">
+      <div class="real">🍜 ก๋วยเตี๋ยวถึงมือ</div><div class="arrow">→</div>
+      <div class="code-side">ข้อมูลจริง (data)</div>
+    </div>
+    <div class="warn-box" style="margin-bottom:0;">
+      ⚠️ ถ้า <b>ไม่ใส่ await</b> = ยืนถือบัตรคิวเฉยๆ ไม่มีวันได้ก๋วยเตี๋ยว →
+      <code>const data = response.json()</code> ได้ Promise มาเฉยๆ พอไปใช้ <code>data.message</code> จะได้ <code>undefined</code>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:4px;">🎬 ภาพเต็ม: สั่งกาแฟ 1 แก้ว ผ่านโค้ด</h3>
+    <p style="color:var(--muted); font-size:0.92rem;">กดปุ่ม แล้วดูว่าแต่ละบรรทัดโค้ด กับสิ่งที่เกิดขึ้นจริงในร้าน คู่กันยังไง</p>
+    <div class="coffee-stage">
+      <div class="steps" id="coffeeSteps">
+        <div class="step"><div class="icon">🗣️</div><div><div class="t">สั่งกาแฟ</div><div class="d">เรียก fetch(url) — ส่งคำขอออกไป</div></div></div>
+        <div class="step"><div class="icon">🎫</div><div><div class="t">ได้รับบัตรคิว</div><div class="d">fetch คืน Promise มาทันที (ยังไม่มีกาแฟ!)</div></div></div>
+        <div class="step"><div class="icon">⏳</div><div><div class="t">await — ยืนรอ</div><div class="d">ฟังก์ชันนี้หยุดรอ แต่หน้าเว็บไปทำอย่างอื่นได้สบาย</div></div></div>
+        <div class="step"><div class="icon">🔔</div><div><div class="t">บัตรดัง! มารับของ</div><div class="d">ได้ response = กล่องพัสดุที่ยังไม่เปิด</div></div></div>
+        <div class="step"><div class="icon">☕</div><div><div class="t">เปิดกล่อง ดื่มกาแฟ</div><div class="d">await response.json() = ของจริงในมือ (data)</div></div></div>
+      </div>
+      <div>
+        <div class="btn-row"><button class="btn btn-orange" id="btnCoffee">▶️ เล่นภาพเต็ม</button></div>
+<pre class="code" style="margin:0;"><span class="ln" data-step="0"><span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"ร้านกาแฟ"</span>)</span>
+<span class="ln" data-step="1">  <span class="cm">// ← ตอนนี้ได้บัตรคิว (Promise)</span></span>
+<span class="ln" data-step="2">  <span class="cm">// ← await ยืนรอ... ไปทำอย่างอื่นก่อนนะ</span></span>
+<span class="ln" data-step="3">  <span class="cm">// ← ได้กล่องพัสดุ (response)</span></span>
+<span class="ln" data-step="4"><span class="kw">const</span> data = <span class="kw">await</span> response.<span class="fn">json</span>()  <span class="cm">// ☕ ของจริง</span></span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SECTION 3: FETCH 2 ROUNDS ================= -->
+<section id="fetch">
+  <h2><span class="num">3</span>Fetch 2 รอบ = พัสดุ 2 ขั้น 📦</h2>
+  <p class="lead">ทำไมต้อง await สองครั้ง? เพราะมันเป็นสองงานคนละเรื่อง: <b>รอกล่องมาส่ง</b> กับ <b>เปิดกล่องอ่านของข้างใน</b> — กดปุ่มเพื่อยิง API จริง (dog.ceo) แล้วดูทุกขั้นพร้อมเวลาจริง</p>
+
+  <div class="card">
+    <div class="pipeline" id="pipeline">
+      <div class="pipe" id="pipe1"><div class="emoji">🚀</div><div class="code-t">await fetch(url)</div><div class="desc">ส่งคำขอ รอกล่องมาถึง</div><div class="time" id="t1"></div></div>
+      <div class="pipe" id="pipe2"><div class="emoji">📦</div><div class="code-t">response.ok ?</div><div class="desc">เช็คกล่องสภาพดีไหม</div><div class="time" id="t2"></div></div>
+      <div class="pipe" id="pipe3"><div class="emoji">✂️</div><div class="code-t">await response.json()</div><div class="desc">เปิดกล่อง อ่านของข้างใน</div><div class="time" id="t3"></div></div>
+      <div class="pipe" id="pipe4"><div class="emoji">🎁</div><div class="code-t">data.message</div><div class="desc">หยิบ URL รูปออกจากกล่อง</div><div class="time" id="t4"></div></div>
+      <div class="pipe" id="pipe5"><div class="emoji">🐶</div><div class="code-t">img.src = ...</div><div class="desc">แปะรูปขึ้นหน้าเว็บ</div><div class="time" id="t5"></div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-purple" id="btnDog">🐶 สุ่มหมาจริง (ยิง API จริงเลย)</button>
+    </div>
+    <div id="dogResult" style="display:none;"><img id="dogImg" alt="รูปหมาสุ่มจาก API" /></div>
+    <div class="console" id="console"><div class="line t-dim">// console จะบันทึกทุกขั้นตอนพร้อมเวลาที่ใช้จริง...</div></div>
+<pre class="code"><span class="ln" id="dog-ln1"><span class="kw">async function</span> <span class="fn">loadDog</span>() {</span>
+<span class="ln" id="dog-ln2">  btn.<span class="prop">disabled</span> = <span class="kw">true</span>                        <span class="cm">// ติดป้าย "รอแปป"</span></span>
+<span class="ln" id="dog-ln3">  <span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(url)          <span class="cm">// รอที่ 1: กล่องมาถึง</span></span>
+<span class="ln" id="dog-ln4">  <span class="kw">if</span> (!response.ok) <span class="fn">console</span>.<span class="fn">error</span>(response.status) <span class="cm">// ตรวจกล่อง</span></span>
+<span class="ln" id="dog-ln5">  <span class="kw">const</span> data = <span class="kw">await</span> response.<span class="fn">json</span>()           <span class="cm">// รอที่ 2: เปิดกล่อง</span></span>
+<span class="ln" id="dog-ln6">  img.<span class="prop">src</span> = data.<span class="prop">message</span>                     <span class="cm">// ของจริงใช้งาน</span></span>
+<span class="ln" id="dog-ln7">  btn.<span class="prop">disabled</span> = <span class="kw">false</span>                       <span class="cm">// เอาป้ายออก</span></span>
+<span class="ln">}</span></pre>
+  </div>
+</section>
+
+<!-- ================= SECTION 4: RULES ================= -->
+<section id="rules">
+  <h2><span class="num">4</span>กติกา 3 ข้อ + กับดักที่เจอมาแล้ว</h2>
+  <p class="lead">สรุปเป็นกฎเหล็กที่เอาไปใช้ได้ทันทีตอนเขียนโค้ดจริง</p>
+
+  <div class="card">
+    <div class="rule"><div class="rnum">1</div><div><b>async คือป้าย, await คือจุดรอ</b><br/><span style="color:var(--muted); font-size:0.92rem;">จะใช้ await ได้ ฟังก์ชันต้องติดป้าย async ไว้หน้าชื่อก่อน — ใส่ await โดยไม่มี async = พังทันที ส่วนมี async แต่ไม่มี await = ไม่พัง แค่ป้ายเกินความจำเป็น</span></div></div>
+    <div class="rule"><div class="rnum">2</div><div><b>await ใช้เฉพาะงานที่ "ใช้เวลา"</b><br/><span style="color:var(--muted); font-size:0.92rem;">fetch, .json(), เรียก API = ใช้เวลา → ต้อง await | เปลี่ยนข้อความ ลบ element = เสร็จทันที → ไม่ต้อง</span></div></div>
+    <div class="rule" style="margin-bottom:0;"><div class="rnum">3</div><div><b>await หยุดแค่ "ฟังก์ชันของตัวเอง"</b><br/><span style="color:var(--muted); font-size:0.92rem;">หน้าเว็บส่วนอื่นเดินต่อ — นั่นคือเหตุผลที่ปุ่มต้อง disabled ด้วยมือ กันคนกดรัวระหว่างโหลด</span></div></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:10px;">🪤 กับดัก: Property (คำนาม) vs Method (คำกริยา)</h3>
+    <table class="vs-table">
+      <tr><th>รูป</th><th>ความหมาย</th><th>ตัวอย่าง</th><th>ผล</th></tr>
+      <tr><td>ไม่มี ( )</td><td>📦 กล่องข้อมูล เปิดดูได้เลย</td><td><code>input.value</code>, <code>img.src</code></td><td><span class="pill green">✅ ถูก</span></td></tr>
+      <tr><td>มี ( )</td><td>⚡ คำสั่ง ให้ลงมือทำ</td><td><code>fetch()</code>, <code>createElement()</code></td><td><span class="pill green">✅ ถูก</span></td></tr>
+      <tr><td><code>input.value()</code></td><td>สั่ง "value" ให้ทำงาน?</td><td>value ไม่ใช่ฟังก์ชัน!</td><td><span class="pill red">💥 พัง</span></td></tr>
+      <tr><td><code>img.scr = ...</code></td><td>พิมพ์ผิด src → scr</td><td>JS เงียบ สร้างกล่องใหม่เฉยๆ</td><td><span class="pill red">👻 bug เงียบ</span></td></tr>
+    </table>
+    <div class="tip-box" style="margin-bottom:0;">💡 <b>นิสัยที่ต้องฝึก:</b> เปิด F12 → Console ทิ้งไว้ตลอด — bug เงียบพวกนี้มี error แดงๆ บอกเสมอ ถ้ารู้จุดที่ต้องมอง</div>
+  </div>
+</section>
+
+<!-- ================= SECTION 5: QUIZ ================= -->
+<section id="quiz">
+  <h2><span class="num">5</span>ทบทวน — คำถามที่ Mentor เค้าชอบถาม 😏</h2>
+  <p class="lead">กดที่คำถามเพื่อเปิดเฉลย (ลองตอบในใจก่อนเปิดนะ — สมองจำได้ดีกว่าดูเฉลยเลย)</p>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q"><span class="qt">1. ถ้าเขียน <code>const data = response.json()</code> (ไม่มี await) — data จะเก็บอะไรไว้?</span><span class="chev">▾</span></div>
+    <div class="a"><div class="inner">ได้ <b>ใบบัตรคิว (Promise)</b> มาเฉยๆ ไม่ใช่ข้อมูลจริง — พอเอาไปใช้ <code>data.message</code> จะได้ <code>undefined</code> เงียบๆ ทดลองได้: <code>console.log(data)</code> จะเห็น Promise {'{ <pending> }'}</div></div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q"><span class="qt">2. มี async แต่ไม่มี await เลยในนั้น — จะเกิดอะไรขึ้น?</span><span class="chev">▾</span></div>
+    <div class="a"><div class="inner">ไม่เกิดอะไรเลย ไม่ error — ฟังก์ชันวิ่งจนจบตามปกติ แค่ป้าย async เกินความจำเป็น (เหมือนติดป้าย "ร้านนี้มีที่จอง" ทั้งที่ไม่มีใครต้องรอ)</div></div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q"><span class="qt">3. ทำไมต้อง await สองรอบ — รอ fetch กับรอ .json()?</span><span class="chev">▾</span></div>
+    <div class="a"><div class="inner">เพราะเป็นงานคนละชิ้น: <b>รอที่ 1</b> = รอกล่องพัสดุมาถึงหน้าบ้าน (ได้ response ที่ยังไม่เปิด) / <b>รอที่ 2</b> = เปิดกล่องแล้วอ่านของข้างใน (ได้ data) — การเปิดกล่องก็ใช้เวลา ก็เลยแจกบัตรคิวมาเป็นของตัวเองอีกใบ</div></div>
+  </div>
+
+  <div class="quiz-q" onclick="this.classList.toggle('open')">
+    <div class="q"><span class="qt">4. await หยุดหน้าเว็บทั้งหน้าใช่ไหม?</span><span class="chev">▾</span></div>
+    <div class="a"><div class="inner"><b>ไม่ใช่!</b> await หยุดแค่ฟังก์ชันที่มันอยู่ — ส่วนอื่นของหน้าเว็บ (เลื่อน กด นาฬิกา) ยังทำงานได้ปกติ ...กลับไปกดปุ่ม ❄️ สีแดงในหัวข้อ 1 แล้วเทียบกับปุ่มเขียวดูสิ</div></div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  🎫 สรุปบทเรียน Async/Await + DOM — จากการเรียนจริงกับ Mentor<br/>
+  กดทุกอย่างในหน้านี้ให้ครบ = เข้าใจจริง ไม่ใช่แค่อ่านผ่าน 😄
+</footer>
+
+<script>
+/* ============================================================
+   โค้ดในหน้านี้ เขียนแบบ Vanilla JS ทั้งหมด —
+   อ่านเล่นได้ มีคอมเมนต์ภาษาไทยทุกส่วน (จำ pattern เดิมที่เรียนมา)
+   ============================================================ */
+
+// ---------- [1] นาฬิกา + จานหมุน (ขับเคลื่อนด้วย JS ล้วนๆ) ----------
+const clockEl = document.querySelector("#clock");
+const spinnerEl = document.querySelector("#spinner");
+const clockBox = document.querySelector("#clockBox");
+const t0 = Date.now();
+
+setInterval(() => {                       // นาฬิกา: อัปเดตทุก 0.1 วิ
+  const s = (Date.now() - t0) / 1000;
+  clockEl.textContent =
+    String(Math.floor(s / 60)).padStart(2, "0") + ":" +
+    String(Math.floor(s % 60)).padStart(2, "0") + "." +
+    String(Math.floor((s % 1) * 10));
+}, 100);
+
+let deg = 0;                              // จานหมุน: หมุนด้วย rAF (JS)
+(function spin() {
+  deg = (deg + 4) % 360;
+  spinnerEl.style.transform = `rotate(${deg}deg)`;
+  requestAnimationFrame(spin);
+})();
+
+// ---------- [2] Demo หยุดทั้งร้าน vs รอแบบมีบัตรคิว ----------
+const btnSync = document.querySelector("#btnSync");
+const btnAsync = document.querySelector("#btnAsync");
+const syncStatus = document.querySelector("#syncStatus");
+
+btnSync.addEventListener("click", () => {
+  syncStatus.className = "status bad";
+  syncStatus.textContent = "❄️ เริ่ม Sync... เฝ้าดูนาฬิกาซ้ายมือ (กำลังจะหยุด!)";
+  clockBox.classList.add("frozen");
+
+  // ❌ แบบเดิม: while วนเปล่าๆ 2 วิ — ทั้งหน้าเว็บตายจริงๆ
+  const start = Date.now();
+  while (Date.now() - start < 2000) { }
+
+  clockBox.classList.remove("frozen");
+  syncStatus.className = "status bad";
+  syncStatus.textContent = "😵 นาฬิกาหยุดไป 2 วินาทีใช่ไหมล่ะ? นี่คือปัญหาที่ async มาแก้";
+});
+
+btnAsync.addEventListener("click", async () => {
+  btnAsync.disabled = true;               // ติดป้ายรอแปบ (pattern เดิม!)
+  btnAsync.textContent = "⏳ กำลังรอ 2 วินาที...";
+  syncStatus.className = "status";
+  syncStatus.textContent = "⏳ รออยู่... ลองเลื่อนหน้า/ดูนาฬิกา — ยังเดินปกติเชียวล่ะ!";
+
+  // ✅ แบบบัตรคิว: รอแบบสงเสีย
+  await new Promise(r => setTimeout(r, 2000));
+
+  btnAsync.disabled = false;
+  btnAsync.textContent = "✅ สั่งงานแบบ Async (รอ 2 วินาที)";
+  syncStatus.className = "status ok";
+  syncStatus.textContent = "✅ เสร็จแล้ว! และหน้าเว็บไม่เคยค้างเลย — นี่แหละคือพลังของ async";
+});
+
+// ---------- [3] Coffee walkthrough: ไล่ step + ไฮไลต์โค้ด ----------
+const btnCoffee = document.querySelector("#btnCoffee");
+const coffeeSteps = [...document.querySelectorAll("#coffeeSteps .step")];
+const codeLines = [...document.querySelectorAll('[data-step]')];
+
+btnCoffee.addEventListener("click", async () => {
+  btnCoffee.disabled = true;
+  coffeeSteps.forEach(s => s.className = "step");
+  codeLines.forEach(l => l.classList.remove("active"));
+
+  for (let i = 0; i < coffeeSteps.length; i++) {
+    coffeeSteps[i].classList.add("on");           // สเต็ปปัจจุบันสว่างส้ม
+    codeLines.forEach(l => l.classList.toggle("active", l.dataset.step == i));
+    await new Promise(r => setTimeout(r, 1100));  // อ่านช้าๆ นิดนึง
+    coffeeSteps[i].classList.remove("on");
+    coffeeSteps[i].classList.add("done");         // เสร็จแล้วเปลี่ยนเขียว
+  }
+  codeLines.forEach(l => l.classList.remove("active"));
+  btnCoffee.disabled = false;
+});
+
+// ---------- [4] Pipeline: ยิง API จริง พร้อมจับเวลา ----------
+const btnDog = document.querySelector("#btnDog");
+const dogResult = document.querySelector("#dogResult");
+const dogImg = document.querySelector("#dogImg");
+const consoleEl = document.querySelector("#console");
+const pipes = [1, 2, 3, 4, 5].map(n => document.querySelector("#pipe" + n));
+const times = [1, 2, 3, 4, 5].map(n => document.querySelector("#t" + n));
+const dogLines = [1, 2, 3, 4, 5, 6, 7].map(n => document.querySelector("#dog-ln" + n));
+
+function log(text, dim) {
+  const div = document.createElement("div");
+  div.className = "line" + (dim ? " t-dim" : "");
+  div.textContent = text;
+  consoleEl.appendChild(div);
+  consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+function resetPipes() {
+  pipes.forEach(p => { p.className = "pipe"; });
+  times.forEach(t => t.textContent = "");
+}
+function highlight(lineIdx) {
+  dogLines.forEach(l => l && l.classList.remove("active"));
+  if (dogLines[lineIdx]) dogLines[lineIdx].classList.add("active");
+}
+
+btnDog.addEventListener("click", async () => {
+  btnDog.disabled = true;                          // pattern เดิม: ล็อกปุ่ม
+  btnDog.textContent = "⏳ กำลังโหลด...";
+  resetPipes();
+  consoleEl.innerHTML = "";
+
+  try {
+    // --- ขั้น 1: fetch (รอกล่องมาถึง) ---
+    pipes[0].classList.add("wait"); highlight(2);
+    log("🚀 ส่ง fetch() ไปหา dog.ceo ... รอกล่องพัสดุ");
+    const start1 = performance.now();
+    const response = await fetch("https://dog.ceo/api/breeds/image/random");
+    const ms1 = Math.round(performance.now() - start1);
+    pipes[0].classList.remove("wait"); pipes[0].classList.add("on");
+    times[0].textContent = ms1 + " ms";
+    log(`📦 กล่องมาถึงแล้ว! (ใช้เวลา ${ms1} ms)`);
+
+    // --- ขั้น 2: เช็คกล่อง ---
+    pipes[1].classList.add("on");
+    times[1].textContent = "ตรวจแล้ว";
+    if (!response.ok) throw new Error("server down " + response.status);
+    log(`✅ กล่องสภาพดี (status ${response.status}) — แต่ยังไม่เปิดนะ!`);
+    await new Promise(r => setTimeout(r, 500));    // พักให้ตาทัน
+
+    // --- ขั้น 3: .json() (เปิดกล่อง) ---
+    pipes[2].classList.add("wait"); highlight(4);
+    log("✂️ กำลังเปิดกล่อง... await response.json()");
+    const start3 = performance.now();
+    const data = await response.json();
+    const ms3 = Math.round(performance.now() - start3);
+    pipes[2].classList.remove("wait"); pipes[2].classList.add("on");
+    times[2].textContent = ms3 + " ms";
+    log(`🎁 ได้ของจริงแล้ว! ข้างในมีช่อง message กับ status`);
+
+    // --- ขั้น 4: หยิบของจากช่อง ---
+    pipes[3].classList.add("on");
+    times[3].textContent = "ช่อง message";
+    log(`🔗 URL รูปอยู่ที่ data.message`);
+    await new Promise(r => setTimeout(r, 500));
+
+    // --- ขั้น 5: แปะรูป ---
+    pipes[4].classList.add("wait"); highlight(5);
+    dogImg.src = data.message;
+    dogResult.style.display = "block";
+    await new Promise(r => setTimeout(r, 600));
+    pipes[4].classList.remove("wait"); pipes[4].classList.add("on");
+    times[4].textContent = "เสร็จ!";
+    highlight(6);
+    log("🐶 รูปขึ้นหน้าเว็บแล้ว — ภารกิจสำเร็จ!");
+    log(`⏱ รวมทั้งหมด: fetch ${ms1}ms + เปิดกล่อง ${ms3}ms = สังเกตว่ารอ "2 ที" จริงๆ`, true);
+
+  } catch (err) {
+    // ถ้าพังกลางทาง — ปุ่มกลับมาเสมอ (เรื่อง try...finally ไว้คุยกันต่อ)
+    log("💥 " + err.message);
+    pipes.forEach(p => p.classList.add("on"));
+  }
+
+  btnDog.disabled = false;                         // เอาป้ายออก
+  btnDog.textContent = "🐶 สุ่มหมาจริง (ยิง API จริงเลย)";
+});
+</script>
+</body>
+</html>

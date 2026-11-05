@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>📚 My Learning Hub — Full-Stack & AI Developer Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fdf8f2;
+    --card: #fff;
+    --ink: #2d2a26;
+    --muted: #7a736a;
+    --primary: #6d4aff;
+    --primary-soft: #efeaff;
+    --accent: #ff8a3d;
+    --green: #1fa97c;
+    --green-soft: #e6f7f0;
+    --gray-soft: #f0ece6;
+    --border: #eee3d6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Sarabun', 'Noto Sans Thai', system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.7;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Hero ---------- */
+  header { text-align: center; padding: 64px 20px 10px; }
+  .avatar { font-size: 3.4rem; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  header h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); font-weight: 800; letter-spacing: -0.5px; }
+  header h1 em { font-style: normal; color: var(--primary); }
+  header p { color: var(--muted); margin-top: 8px; font-size: 1.02rem; }
+
+  /* ---------- Progress ---------- */
+  .progress-box {
+    max-width: 480px; margin: 26px auto 0; background: var(--card);
+    border: 1px solid var(--border); border-radius: 16px; padding: 16px 20px;
+    box-shadow: 0 4px 14px rgba(90,70,40,0.05);
+  }
+  .progress-box .lbl { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; }
+  .progress-box .lbl span:last-child { color: var(--green); }
+  .bar { height: 10px; background: var(--gray-soft); border-radius: 99px; margin-top: 8px; overflow: hidden; }
+  .bar .fill { height: 100%; width: 25%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width 1s ease; }
+
+  /* ---------- Section ---------- */
+  section { padding: 36px 0 8px; }
+  h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 14px; }
+  h2 .dot { color: var(--accent); }
+
+  /* ---------- Cards ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .card {
+    display: block; text-decoration: none; background: var(--card);
+    border: 1px solid var(--border); border-radius: 16px; padding: 20px;
+    transition: 0.2s; position: relative; overflow: hidden;
+  }
+  a.card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 8px 22px rgba(109,74,255,0.15); }
+  .card .emoji { font-size: 1.9rem; }
+  .card .title { font-weight: 800; margin-top: 6px; font-size: 1.02rem; }
+  .card .desc { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
+  .card .status {
+    display: inline-block; margin-top: 12px; font-size: 0.75rem; font-weight: 700;
+    padding: 3px 12px; border-radius: 99px;
+  }
+  .status.done { background: var(--green-soft); color: var(--green); }
+  .status.now { background: #fff1e5; color: var(--accent); }
+  .status.soon { background: var(--gray-soft); color: var(--muted); }
+  .card.disabled { opacity: 0.65; cursor: default; }
+  .card.disabled:hover { transform: none; border-color: var(--border); box-shadow: none; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 44px 20px 54px; }
+  footer code { background: var(--primary-soft); color: var(--primary); padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="avatar">👨‍💻</div>
+  <h1>My <em>Learning Hub</em></h1>
+  <p>เส้นทางจาก Junior สู่ Full-Stack & AI Integration Developer</p>
+
+  <div class="progress-box">
+    <div class="lbl"><span>ความคืบหน้า Phase 1-4</span><span>1 / 4</span></div>
+    <div class="bar"><div class="fill"></div></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= PHASE 1 ================= -->
+  <section>
+    <h2><span class="dot">●</span> Phase 1 — Frontend Basics</h2>
+    <div class="grid">
+
+      <!-- ✅ การ์ดที่เรียนแล้ว: มีลิงก์จริง -->
+      <a class="card" href="async-await-explained.html">
+        <div class="emoji">🎫</div>
+        <div class="title">Async / Await + Fetch</div>
+        <div class="desc">เรียนรู้ด้วยบัตรคิวร้านก๋วยเตี๋ยว — DOM, Promise, Fetch 2 รอบ, มี demo กดเล่นได้</div>
+        <span class="status done">✅ เรียนแล้ว</span>
+      </a>
+
+      <!-- ⏳ การ์ดยังไม่ได้เรียน: ไม่มีลิงก์ -->
+      <div class="card disabled">
+        <div class="emoji">🎨</div>
+        <div class="title">Flexbox & Grid ลึกกว่าเดิม</div>
+        <div class="desc">Responsive layout, media queries, จัดหน้าจอมือถือ</div>
+        <span class="status soon">⏳ เร็วๆ นี้</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= PHASE 2 ================= -->
+  <section>
+    <h2><span class="dot">●</span> Phase 2 — Python Core</h2>
+    <div class="grid">
+      <div class="card disabled">
+        <div class="emoji">🐍</div>
+        <div class="title">Python Refresher</div>
+        <div class="desc">Dict/List, Function, JSON, venv — รื้อฟื้นความรู้เก่า</div>
+        <span class="status now">🚧 กำลังจะเริ่ม</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PHASE 3 ================= -->
+  <section>
+    <h2><span class="dot">●</span> Phase 3 — Backend & API</h2>
+    <div class="grid">
+      <div class="card disabled">
+        <div class="emoji">⚙️</div>
+        <div class="title">FastAPI Basics</div>
+        <div class="desc">REST API, status codes, CORS, เก็บ API Key ด้วย .env</div>
+        <span class="status soon">⏳ เร็วๆ นี้</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PHASE 4 ================= -->
+  <section>
+    <h2><span class="dot">●</span> Phase 4 — AI Integration + โปรเจกต์</h2>
+    <div class="grid">
+      <div class="card disabled">
+        <div class="emoji">🤖</div>
+        <div class="title">AI API ด้วย Python</div>
+        <div class="desc">ส่งคำสั่งไปหา Gemini API ผ่าน httpx + จัดการ timeout</div>
+        <span class="status soon">⏳ เร็วๆ นี้</span>
+      </div>
+      <div class="card disabled">
+        <div class="emoji">🍳</div>
+        <div class="title">MenuMind (Project S)</div>
+        <div class="desc">แอปเมนูอาหาร + AI แนะนำเมนูจากของในตู้เย็น</div>
+        <span class="status soon">⏳ เร็วๆ นี้</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    💡 วิธีเพิ่มบทเรียนใหม่: ก๊อปการ์ดใบเดิม → แก้ชื่อ/คำอธิบาย → เปลี่ยนลิงก์ใน <code>href="ชื่อไฟล์.html"</code><br/>
+    แล้วอัปโหลดไฟล์ .html ใหม่ขึ้น repo เดียวกัน — เสร็จ!
+  </footer>
+
+</div>
+</body>
+</html>
